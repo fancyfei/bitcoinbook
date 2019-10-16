@@ -304,29 +304,29 @@ Over time, the way transaction fees are calculated and the effect they have on t
 
 Fee estimation algorithms calculate the appropriate fee, based on capacity and the fees offered by "competing" transactions. These algorithms range from simplistic (average or median fee in the last block) to sophisticated (statistical analysis). They estimate the necessary fee (in satoshis per byte) that will give a transaction a high probability of being selected and included within a certain number of blocks. Most services offer users the option of choosing high, medium, or low priority fees. High priority means users pay higher fees but the transaction is likely to be included in the next block. Medium and low priority means users pay lower transaction fees but the transactions may take much longer to confirm.
 
-((("bitcoinfees (third-party service)")))Many wallet applications use third-party services for fee calculations. One popular service is https://bitcoinfees.21.co/[_https://bitcoinfees.21.co/_], which provides an API and a visual chart showing the fee in satoshi/byte for different priorities.
+((("bitcoinfees (third-party service)")))Many wallet applications use third-party services for fee calculations. One popular service is https://bitcoinfees.earn.com/[_https://bitcoinfees.earn.com/_], which provides an API and a visual chart showing the fee in satoshi/byte for different priorities.
 
 [TIP]
 ====
 ((("static fees")))((("fees", "static fees")))Static fees are no longer viable on the bitcoin network. Wallets that set static fees will produce a poor user experience as transactions will often get "stuck" and remain unconfirmed. Users who don't understand bitcoin transactions and fees are dismayed by "stuck" transactions because they think they've lost their money.
 ====
 
-The chart in <<bitcoinfees21co>> shows the real-time estimate of fees in 10 satoshi/byte increments and the expected confirmation time (in minutes and number of blocks) for transactions with fees in each range. For each fee range (e.g., 61&#x2013;70 satoshi/byte), two horizontal bars show the number of unconfirmed transactions (1405) and total number of transactions in the past 24 hours (102,975), with fees in that range. Based on the graph, the recommended high-priority fee at this time was 80 satoshi/byte, a fee likely to result in the transaction being mined in the very next block (zero block delay). For perspective, the median transaction size is 226 bytes, so the recommended fee for a transaction size would be 18,080 satoshis (0.00018080 BTC).
+The chart in <<bitcoinfeesearncom>> shows the real-time estimate of fees in 10 satoshi/byte increments and the expected confirmation time (in minutes and number of blocks) for transactions with fees in each range. For each fee range (e.g., 61&#x2013;70 satoshi/byte), two horizontal bars show the number of unconfirmed transactions (1405) and total number of transactions in the past 24 hours (102,975), with fees in that range. Based on the graph, the recommended high-priority fee at this time was 80 satoshi/byte, a fee likely to result in the transaction being mined in the very next block (zero block delay). For perspective, the median transaction size is 226 bytes, so the recommended fee for a transaction size would be 18,080 satoshis (0.00018080 BTC).
 
-The fee estimation data can be retrieved via a simple HTTP REST API, at https://bitcoinfees.21.co/api/v1/fees/recommended[https://bitcoinfees.21.co/api/v1/fees/recommended]. For example, on the command line using the +curl+ command:
+The fee estimation data can be retrieved via a simple HTTP REST API, at https://bitcoinfees.earn.com/api/v1/fees/recommended[https://bitcoinfees.earn.com/api/v1/fees/recommended]. For example, on the command line using the +curl+ command:
 
 .Using the fee estimation API
 ----
-$ curl https://bitcoinfees.21.co/api/v1/fees/recommended
+$ curl https://bitcoinfees.earn.com/api/v1/fees/recommended
 
 {"fastestFee":80,"halfHourFee":80,"hourFee":60}
 ----
 
 The API returns a JSON object with the current fee estimate for fastest confirmation (+fastestFee+), confirmation within three blocks (+halfHourFee+) and six blocks (+hourFee+), in satoshi per byte.
 
-[[bitcoinfees21co]]
-.Fee estimation service bitcoinfees.21.co
-image::images/mbc2_0602.png[Fee Estimation Service bitcoinfees.21.co]
+[[bitcoinfeesearncom]]
+.Fee estimation service bitcoinfees.earn.com
+image::images/mbc2_0602.png[Fee Estimation Service bitcoinfees.earn.com]
 
 ==== Adding Fees to Transactions
 
@@ -615,6 +615,12 @@ In addition, there is a modifier flag +SIGHASH_ANYONECANPAY+, which can be combi
 | SINGLE\|ANYONECANPAY | 0x83 | Signature applies to one input and the output with the same index number
 |=======================
 
+These flag combinations are summarized in <<sighash_combinations>>.
+
+[[sighash_combinations]]
+.Summary of different sighash combinations
+image::images/sighash_combinations.png["Summary of different SIGHASH flag combinations"]
+
 The way +SIGHASH+ flags are applied during signing and verification is that a copy of the transaction is made and certain fields within are truncated (set to zero length and emptied). The resulting transaction is serialized. The +SIGHASH+ flag is added to the end of the serialized transaction and the result is hashed. The hash itself is the "message" that is signed. Depending on which +SIGHASH+ flag is used, different parts of the transaction are truncated. The resulting hash depends on different subsets of the data in the transaction. By including the +SIGHASH+ as the last step before hashing, the signature commits the +SIGHASH+ type as well, so it can't be changed (e.g., by a miner).
 
 [NOTE]
@@ -650,7 +656,7 @@ The temporary key pair is based on a random number _k_, which is used as the tem
 
 From there, the algorithm calculates the _S_ value of the signature, such that:
 
-_S_ = __k__^-1^ (__Hash__(__m__) + __dA__ * __R__) _mod p_
+_S_ = __k__^-1^ (__Hash__(__m__) + __dA__ * __R__) _mod n_
 
 where:
 
@@ -658,7 +664,7 @@ where:
 * _R_ is the x coordinate of the ephemeral public key
 * _dA_ is the signing private key
 * _m_ is the transaction data
-* _p_ is the prime order of the elliptic curve
+* _n_ is the prime order of the elliptic curve
 
 Verification is the inverse of the signature generation function, using the _R_, _S_ values and the public key to calculate a value _P_, which is a point on the elliptic curve (the ephemeral public key used in signature creation):
 

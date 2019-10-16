@@ -710,7 +710,7 @@ With Segregated Witness, Alice would create a Pay-to-Witness-Public-Key-Hash (P2
 0 ab68025513c3dbd2f7b92a94e0581f5d50f654e7
 ----
 
-As you can see, a Segregated Witness output’s locking script is much simpler than a traditional output. It consists of two values that are pushed on to the script evaluation stack. To an old (nonsegwit-aware) bitcoin client, the two pushes would look like an output that anyone can spend and does not require a signature (or rather, can be spent with an empty signature). To a newer, segwit-aware client, the first number (0) is interpreted as a version number (the _witness version_) and the second part (20 bytes) is the equivalent of a locking script known as a _witness program_. The 20-byte witness program is simply the hash of the public key, as in a P2PKH script
+As you can see, a Segregated Witness output’s locking script is much simpler than a traditional output. It consists of two values that are pushed on to the script evaluation stack. To an old (nonsegwit-aware) bitcoin client, the two pushes would look like an output that anyone can spend and does not require a signature (or rather, can be spent with an empty signature). To a newer, segwit-aware client, the first number (0) is interpreted as a version number (the _witness version_) and the second part (20 bytes) is the equivalent of a locking script known as a _witness program_. The 20-byte witness program is simply the hash of the public key, as in a P2PKH script.
 
 Now, let’s look at the corresponding transaction that Bob uses to spend this output. For the original script (nonsegwit), Bob’s transaction would have to include a signature within the transaction input:
 
@@ -948,7 +948,7 @@ The native segwit address format is defined in BIP-173:
 
 https://github.com/bitcoin/bips/blob/master/bip-0173.mediawiki[BIP-173]:: Base32 address format for native v0-16 witness outputs
 
-BIP-173 only encodes witness (P2WPKH and P2WSH) scripts. It is not compatible with non-segwit P2PKH or P2SH scripts. BIP-173 is a checksummed Base32 encoding, as compared to the Base58 encoding of a "traditional" bitcoin address. BIP-173 addesses are also called _bech32_ addresses, pronounced "beh-ch thirty two", alluding to the use of a "BCH" error detection algorithm and 32-character encoding set.
+BIP-173 only encodes witness (P2WPKH and P2WSH) scripts. It is not compatible with non-segwit P2PKH or P2SH scripts. BIP-173 is a checksummed Base32 encoding, as compared to the Base58 encoding of a "traditional" bitcoin address. BIP-173 addresses are also called _bech32_ addresses, pronounced "beh-ch thirty two", alluding to the use of a "BCH" error detection algorithm and 32-character encoding set.
 
 BIP-173 addresses use 32 lower-case-only alphanumeric character set, carefully selected to reduce errors from misreading or mistyping. By choosing a lower-case-only character set, bech32 is easier to read, speak, and 45% more efficient to encode in QR codes.
 
